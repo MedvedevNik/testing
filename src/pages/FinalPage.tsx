@@ -12,9 +12,6 @@ const FinalPage: React.FC = () => {
   );
   const navigate = useNavigate();
   const questions = useSelector((state: RootState) => state.test.questions);
-  const correctAnswers = useSelector(
-    (state: RootState) => state.test.correctAnswers,
-  );
   const dispatch = useDispatch();
 
   const handleRetakeTest = () => {
@@ -27,29 +24,21 @@ const FinalPage: React.FC = () => {
       <Typography variant="h3" gutterBottom>
         Финальная страница
       </Typography>
-      <Typography variant="h5">Неправильные ответы</Typography>
+      <Typography variant="h5">Ваши ответы</Typography>
       <List>
         {selectedOptions.map((option, index) => (
           <ListItem
             key={index}
             sx={{
               color:
-                option !== questions[index].correctAnswer ? "red" : "initial",
+                option !== questions[index].correctAnswer ? "red" : "green",
             }}
           >
-            {`Вопрос ${index + 1}: ${questions[index].question}, ${
+            {`Вопрос ${index + 1}: ${questions[index].question} Выбранный вариант: ${option}  ${
               option === questions[index].correctAnswer
-                ? "Правильный вариант"
-                : `Выбранный вариант: ${option}`
+                ? ""
+                : `/ Правильный вариант: ${questions[index].correctAnswer}`
             }`}
-          </ListItem>
-        ))}
-      </List>
-      <Typography variant="h5">Правильные ответы</Typography>
-      <List>
-        {correctAnswers.map((answer, index) => (
-          <ListItem key={index} sx={{ color: "green" }}>
-            {`Вопрос ${index + 1}: ${answer}`}
           </ListItem>
         ))}
       </List>

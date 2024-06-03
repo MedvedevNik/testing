@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store";
-import { selectOption } from "../store/testSlice";
+import { selectOption, setCurrentQuestionIndex } from "../store/testSlice";
 import { useNavigate } from "react-router-dom";
 import Question from "../components/Question";
 import { Box, Typography, Button } from "@mui/material";
+import Timer from "../components/Timer";
+import ProgressBar from "../components/ProgressBar";
 
 const TestPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -17,15 +19,43 @@ const TestPage: React.FC = () => {
   const handleSelectOption = (option: string) => {
     dispatch(selectOption(option));
   };
+
   const handleFinishTest = () => {
     navigate("/final");
   };
+
+  const handleTimeUp = () => {
+    alert("Время вышло!");
+  };
+
+  // Эффект для сохранения текущего id вопроса в localStorage
+  useEffect(() => {
+    localStorage.setItem("currentQuestionIndex", String(currentQuestionIndex));
+  }, [currentQuestionIndex]);
+
+  // Эффект для восстановления текущего id вопроса из localStorage при монтировании
+  useEffect(() => {
+    const storedCurrentQuestionIndex = localStorage.getItem(
+      "currentQuestionIndex",
+    );
+    if (storedCurrentQuestionIndex !== null) {
+      const index = parseInt(storedCurrentQuestionIndex, 10);
+      if (!isNaN(index)) {
+        dispatch(setCurrentQuestionIndex(index));
+      }
+    }
+  }, [dispatch]);
 
   return (
     <Box sx={{ textAlign: "center" }}>
       <Typography variant="h4" gutterBottom>
         Тестирование
       </Typography>
+      <Timer durationInSeconds={600} onTimeUp={handleTimeUp} />
+      <ProgressBar
+        currentQuestionIndex={currentQuestionIndex + 1} // Индекс вопроса + 1 для корректного отображения
+        totalQuestions={questions.length}
+      />
       {questions.length > 0 && (
         <Question
           question={questions[currentQuestionIndex].question}
@@ -35,7 +65,7 @@ const TestPage: React.FC = () => {
       )}
       {currentQuestionIndex === questions.length - 1 && (
         <Button variant="contained" onClick={handleFinishTest}>
-          Finish Test
+          Завершить тест
         </Button>
       )}
     </Box>
